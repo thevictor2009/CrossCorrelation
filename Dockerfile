@@ -19,7 +19,6 @@ COPY --from=builder /app/target/CrossCorrelationWithBot-0.0.1-SNAPSHOT-jar-with-
 
 # Render ожидает, что приложение слушает порт 10000
 EXPOSE 10000
-EXPOSE 8080
 
 # Запускаем приложение
 ENTRYPOINT ["java", "-jar", "app.jar"]
