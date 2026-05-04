@@ -107,6 +107,8 @@ public class CrossCorrelationWithBot {
 		}
 		// iнициализация telegramBot
 		telegramBot = new TelegramBot();
+		
+		startHealthServer();
 		// Инициализация списка
 		for (int i = 0; i < symbols.length; i++) {
 			symbols2.add(symbols[i]);
@@ -256,6 +258,48 @@ public class CrossCorrelationWithBot {
 
 	}
 
+	private static void startHealthServer() {
+	    Thread healthThread = new Thread(() -> {
+	        try {
+	            String portEnv = System.getenv("PORT");
+	            int port = portEnv != null ? Integer.parseInt(portEnv) : 8080;
+	            
+	            com.sun.net.httpserver.HttpServer server = com.sun.net.httpserver.HttpServer.create(
+	                new java.net.InetSocketAddress(port), 0);
+	            
+	            server.createContext("/", exchange -> {
+	                String response = "Bot is running";
+	                exchange.getResponseHeaders().set("Content-Type", "text/plain");
+	                exchange.getResponseHeaders().set("Cache-Control", "no-cache");
+	                
+	                if ("HEAD".equals(exchange.getRequestMethod())) {
+	                    exchange.sendResponseHeaders(200, -1);
+	                } else {
+	                    exchange.sendResponseHeaders(200, response.length());
+	                    exchange.getResponseBody().write(response.getBytes());
+	                }
+	                exchange.getResponseBody().close();
+	            });
+	            
+	            server.createContext("/health", exchange -> {
+	                String response = "{\"status\":\"ok\", \"timestamp\":\"" + System.currentTimeMillis() + "\"}";
+	                exchange.getResponseHeaders().set("Content-Type", "application/json");
+	                exchange.sendResponseHeaders(200, response.length());
+	                exchange.getResponseBody().write(response.getBytes());
+	                exchange.getResponseBody().close();
+	            });
+	            
+	            server.setExecutor(null);
+	            server.start();
+	            System.out.println("✅ Health check server started on port " + port);
+	        } catch (Exception e) {
+	            System.err.println("❌ Failed to start health server: " + e.getMessage());
+	        }
+	    });
+	    
+	    healthThread.setDaemon(true); // Поток-демон, чтобы не блокировать завершение
+	    healthThread.start();
+	}
 	public static double calculateVolatility(List<Double> prices, int period) {
 		if (prices == null || prices.size() < period + 1) {
 			return 0.2; // защитное значение: 0.2% (чтобы порог не был нулевым)
