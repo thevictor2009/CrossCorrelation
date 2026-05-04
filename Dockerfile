@@ -1,19 +1,24 @@
-# Используем современный образ с Maven 3.9 и Java 17
+# Стадия 1: Сборка приложения
 FROM maven:3.9.4-eclipse-temurin-17 AS builder
 WORKDIR /app
+
+# Копируем pom.xml и скачиваем зависимости (кэшируется для ускорения сборки)
 COPY pom.xml .
 RUN mvn dependency:go-offline
+
+# Копируем исходный код и собираем JAR
 COPY src ./src
-
-RUN echo "=== Содержимое /app ===" && ls -la /app
-RUN echo "=== Содержимое /app/src ===" && ls -la /app/src || echo "src не скопировалась!"
-
 RUN mvn clean package -DskipTests
 
-# Финальный образ с Java 17
-FROM eclipse-temurin:17-jdk-alpine
+# Стадия 2: Запуск приложения
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=builder /app/target/*-with-dependencies.jar app.jar
-EXPOSE 8080
+
+# Копируем собранный JAR из стадии builder
+COPY --from=builder /app/target/CrossCorrelationWithBot-0.0.1-SNAPSHOT-jar-with-dependencies.jar app.jar
+
+# Render ожидает, что приложение слушает порт 10000
 EXPOSE 10000
+
+# Запускаем приложение
 ENTRYPOINT ["java", "-jar", "app.jar"]
