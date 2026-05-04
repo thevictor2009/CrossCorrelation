@@ -27,6 +27,8 @@ import org.json.JSONObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ru.the_victor2009.PairTrade2.TelegramBot;
+
 public class CrossCorrelationWithBot {
 
 	static String[] symbols = { "ETHUSDT", "SOLUSDT", "DOGEUSDT", "XAUUSDT", "CLUSDT", "XAGUSDT", "SKYAIUSDT",
@@ -100,13 +102,15 @@ public class CrossCorrelationWithBot {
 		CorrelationResults result = null;
 		double corCoef = 0;
 
+
+		//iнициализация telegramBot
+		telegramBot = new TelegramBot();
+		
 		// Проверка доступности Binance API
 		if (!testConnection()) {
-			System.err.println("Нет подключения к Binance API. Проверьте интернет.");
-			return;
+			System.out.println("Нет подключения к Binance API. Проверьте интернет. Ждем 10 мин");
+			Thread.sleep(1000 * 60 * 10);// ждем 10 мин
 		}
-		// iнициализация telegramBot
-		telegramBot = new TelegramBot();
 		
 		startHealthServer();
 		// Инициализация списка
