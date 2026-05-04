@@ -27,8 +27,6 @@ import org.json.JSONObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ru.the_victor2009.PairTrade2.TelegramBot;
-
 public class CrossCorrelationWithBot {
 
 	static String[] symbols = { "ETHUSDT", "SOLUSDT", "DOGEUSDT", "XAUUSDT", "CLUSDT", "XAGUSDT", "SKYAIUSDT",
