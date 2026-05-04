@@ -1,0 +1,24 @@
+# Compiled files
+target/
+*.class
+
+# IDE files
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Logs
+*.log
+
+# Environment files
+.env
+.DS_Store
+
+# Maven
+mvnw
+mvnw.cmd
+.mvn/
